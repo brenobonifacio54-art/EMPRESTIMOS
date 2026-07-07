@@ -392,9 +392,18 @@ export default function App(){
 
   // Previne zoom ao focar input no iOS
   useEffect(()=>{
-    const meta=document.querySelector('meta[name="viewport"]');
-    if(meta) meta.setAttribute("content","width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
-  },[]);
+  const meta=document.querySelector('meta[name="viewport"]');
+  const reset=()=>{
+    if(meta){
+      meta.setAttribute("content","width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
+      setTimeout(()=>{
+        meta.setAttribute("content","width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes");
+      },300);
+    }
+  };
+  document.addEventListener('focusout', reset);
+  return ()=>document.removeEventListener('focusout', reset);
+},[]);
 
   async function reload(){
     setLoading(true);
