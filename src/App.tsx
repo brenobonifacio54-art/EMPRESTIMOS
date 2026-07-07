@@ -49,7 +49,8 @@ function expired(dt,st){ return !(!dt||st==="pago") && new Date(dt+"T23:59:59") 
 function daysLeft(dt,st){ if(!dt||st==="pago") return null; return Math.ceil((new Date(dt+"T23:59:59")-new Date())/864e5); }
 function initials(n){ return (n||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
 
-const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:8, color:"#fff", padding:"9px 11px", fontSize:13, fontFamily:"inherit", marginBottom:10, outline:"none", boxSizing:"border-box" };
+const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:8, color:"#fff", padding:"9px 11px", fontSize:16, fontFamily:"inherit", marginBottom:10, outline:"none", boxSizing:"border-box" };
+
 const card = { background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:14, padding:16, marginBottom:10 };
 
 function Btn({ ch, fn, type="def", disabled=false }){
