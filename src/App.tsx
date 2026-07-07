@@ -3,35 +3,58 @@ import React, { useState, useEffect } from "react";
 
 const SUPA_URL = "https://qptkhnkvurtxwsovmmzi.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdGtobmt2dXJ0eHdzb3ZtbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNzk1NTQsImV4cCI6MjA5ODk1NTU1NH0.9n9uZpT4lbxA7zUmEtaX6Ws2Hu7cB2HXtp7jLBdRp0U";
-const USER_ID = "breno";
-const SENHA = "breno2024";
 
-async function sbGet(table) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${table}?user_id=eq.${USER_ID}&order=created_at.asc`, {
-    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` },
+// ── Auth ──────────────────────────────────────────────────────────────
+async function signUp(email, password) {
+  const res = await fetch(`${SUPA_URL}/auth/v1/signup`, {
+    method: "POST",
+    headers: { apikey: SUPA_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
   });
   return res.json();
 }
-async function sbInsert(table, data) {
+async function signIn(email, password) {
+  const res = await fetch(`${SUPA_URL}/auth/v1/token?grant_type=password`, {
+    method: "POST",
+    headers: { apikey: SUPA_KEY, "Content-Type": "application/json" },
+    body: JSON.stringify({ email, password }),
+  });
+  return res.json();
+}
+async function signOut(token) {
+  await fetch(`${SUPA_URL}/auth/v1/logout`, {
+    method: "POST",
+    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${token}` },
+  });
+}
+
+// ── DB ───────────────────────────────────────────────────────────────
+async function sbGet(table, token) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${table}?order=created_at.asc`, {
+    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${token}` },
+  });
+  return res.json();
+}
+async function sbInsert(table, data, token) {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}`, {
     method: "POST",
-    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
-    body: JSON.stringify({ ...data, user_id: USER_ID }),
-  });
-  return res.json();
-}
-async function sbUpdate(table, id, data) {
-  const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
-    method: "PATCH",
-    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${token}`, "Content-Type": "application/json", Prefer: "return=representation" },
     body: JSON.stringify(data),
   });
   return res.json();
 }
-async function sbDelete(table, id) {
+async function sbUpdate(table, id, data, token) {
+  const res = await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
+    method: "PATCH",
+    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${token}`, "Content-Type": "application/json", Prefer: "return=representation" },
+    body: JSON.stringify(data),
+  });
+  return res.json();
+}
+async function sbDelete(table, id, token) {
   await fetch(`${SUPA_URL}/rest/v1/${table}?id=eq.${id}`, {
     method: "DELETE",
-    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${SUPA_KEY}` },
+    headers: { apikey: SUPA_KEY, Authorization: `Bearer ${token}` },
   });
 }
 
@@ -49,22 +72,7 @@ function expired(dt,st){ return !(!dt||st==="pago") && new Date(dt+"T23:59:59") 
 function daysLeft(dt,st){ if(!dt||st==="pago") return null; return Math.ceil((new Date(dt+"T23:59:59")-new Date())/864e5); }
 function initials(n){ return (n||"").split(" ").map(w=>w[0]).join("").slice(0,2).toUpperCase(); }
 
-// Estilo base para todos os inputs — fontSize 16px evita zoom no iOS
-const inp = {
-  width:"100%",
-  background:"rgba(255,255,255,0.07)",
-  border:"1px solid rgba(255,255,255,0.15)",
-  borderRadius:8,
-  color:"#fff",
-  padding:"9px 11px",
-  fontSize:"16px",
-  fontFamily:"inherit",
-  marginBottom:10,
-  outline:"none",
-  boxSizing:"border-box",
-  WebkitAppearance:"none",
-};
-
+const inp = { width:"100%", background:"rgba(255,255,255,0.07)", border:"1px solid rgba(255,255,255,0.15)", borderRadius:8, color:"#fff", padding:"9px 11px", fontSize:"16px", fontFamily:"inherit", marginBottom:10, outline:"none", boxSizing:"border-box", WebkitAppearance:"none" };
 const card = { background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,255,255,0.1)", borderRadius:14, padding:16, marginBottom:10 };
 
 function Btn({ ch, fn, type="def", disabled=false }){
@@ -76,9 +84,7 @@ function Btn({ ch, fn, type="def", disabled=false }){
   };
   return <button onClick={fn} disabled={disabled} style={styles[type]}>{ch}</button>;
 }
-
 function Label({ t }){ return <div style={{fontSize:"11px",color:"#888",marginBottom:3,textTransform:"uppercase",letterSpacing:"0.05em"}}>{t}</div>; }
-
 function Overlay({ children, onClose }){
   return (
     <div onClick={onClose} style={{position:"fixed",inset:0,background:"rgba(0,0,0,0.7)",display:"flex",alignItems:"center",justifyContent:"center",zIndex:999,padding:16,overflowY:"auto"}}>
@@ -88,31 +94,66 @@ function Overlay({ children, onClose }){
     </div>
   );
 }
-
 function Spinner(){ return <div style={{textAlign:"center",padding:40,color:"#666"}}>Carregando...</div>; }
 
+// ── LOGIN ─────────────────────────────────────────────────────────────
 function LoginPage({ onLogin }){
-  const [p,setP]=useState("");
+  const [mode,setMode]=useState("login");
+  const [email,setEmail]=useState("");
+  const [pass,setPass]=useState("");
+  const [pass2,setPass2]=useState("");
+  const [nome,setNome]=useState("");
   const [err,setErr]=useState("");
-  function go(){ if(p===SENHA){ onLogin(); } else { setErr("Senha incorreta."); } }
-  return (
+  const [ok,setOk]=useState("");
+  const [loading,setLoading]=useState(false);
+
+  async function go(){
+    setErr(""); setOk(""); setLoading(true);
+    if(mode==="login"){
+      if(!email||!pass){ setErr("Preencha email e senha."); setLoading(false); return; }
+      const r=await signIn(email,pass);
+      if(r.error){ setErr(r.error.message==="Invalid login credentials"?"Email ou senha incorretos.":r.error.message); setLoading(false); return; }
+      localStorage.setItem("sb_token", r.access_token);
+      localStorage.setItem("sb_user", JSON.stringify({email:r.user.email, id:r.user.id}));
+      onLogin({token:r.access_token, email:r.user.email, id:r.user.id});
+    } else {
+      if(!nome||!email||!pass||!pass2){ setErr("Preencha todos os campos."); setLoading(false); return; }
+      if(pass!==pass2){ setErr("Senhas não coincidem."); setLoading(false); return; }
+      if(pass.length<6){ setErr("Senha mínima de 6 caracteres."); setLoading(false); return; }
+      const r=await signUp(email,pass);
+      if(r.error){ setErr(r.error.message); setLoading(false); return; }
+      setOk("Conta criada! Verifique seu email para confirmar."); setMode("login");
+    }
+    setLoading(false);
+  }
+
+  const lnk=(txt,m)=><button onClick={()=>{setMode(m);setErr("");setOk("");}} style={{background:"none",border:"none",color:"#1ec882",cursor:"pointer",fontSize:"13px",fontFamily:"inherit",textDecoration:"underline"}}>{txt}</button>;
+
+  return(
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:BG,fontFamily:"'Inter',sans-serif",padding:20}}>
-      <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:24,padding:"36px 28px",width:340,maxWidth:"100%",color:"#fff",textAlign:"center"}}>
-        <div style={{fontSize:40,marginBottom:12}}>💰</div>
-        <h2 style={{margin:"0 0 4px",fontSize:22}}>Emprestimos BN8K</h2>
-        <p style={{color:"#666",fontSize:"14px",margin:"0 0 24px"}}>Acesso privado</p>
-        {err&&<div style={{background:"rgba(220,50,50,0.15)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",fontSize:"14px",color:"#ff8888",marginBottom:12}}>{err}</div>}
-        <Label t="Senha de acesso"/>
-        <input style={inp} type="password" placeholder="••••••••" value={p} onChange={e=>{setP(e.target.value);setErr("");}} onKeyDown={e=>e.key==="Enter"&&go()}/>
-        <button onClick={go} style={{width:"100%",padding:11,fontSize:"16px",borderRadius:10,background:"linear-gradient(135deg,#1ec882,#14a064)",border:"none",color:"#fff",fontFamily:"inherit",fontWeight:600,cursor:"pointer"}}>
-          Entrar
+      <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:24,padding:"36px 28px",width:360,maxWidth:"100%",color:"#fff"}}>
+        <div style={{fontSize:40,textAlign:"center",marginBottom:12}}>💰</div>
+        <h2 style={{textAlign:"center",margin:"0 0 4px",fontSize:22}}>Emprestimos BN8K</h2>
+        <p style={{textAlign:"center",color:"#666",fontSize:"14px",margin:"0 0 24px"}}>{mode==="login"?"Entre na sua conta":"Criar nova conta"}</p>
+        {err&&<div style={{background:"rgba(220,50,50,0.15)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",fontSize:"13px",color:"#ff8888",marginBottom:12,textAlign:"center"}}>{err}</div>}
+        {ok&&<div style={{background:"rgba(30,200,130,0.1)",border:"1px solid rgba(30,200,130,0.3)",borderRadius:8,padding:"8px 12px",fontSize:"13px",color:"#80ffcc",marginBottom:12,textAlign:"center"}}>{ok}</div>}
+        {mode==="register"&&<><Label t="Seu nome"/><input style={inp} placeholder="Nome completo" value={nome} onChange={e=>{setNome(e.target.value);setErr("");}}/></>}
+        <Label t="Email"/><input style={inp} type="email" placeholder="seu@email.com" value={email} onChange={e=>{setEmail(e.target.value);setErr("");}}/>
+        <Label t="Senha"/><input style={inp} type="password" placeholder="••••••••" value={pass} onChange={e=>{setPass(e.target.value);setErr("");}} onKeyDown={e=>e.key==="Enter"&&go()}/>
+        {mode==="register"&&<><Label t="Confirmar senha"/><input style={inp} type="password" placeholder="••••••••" value={pass2} onChange={e=>{setPass2(e.target.value);setErr("");}}/></>}
+        <button onClick={go} disabled={loading} style={{width:"100%",padding:11,fontSize:"16px",borderRadius:10,background:"linear-gradient(135deg,#1ec882,#14a064)",border:"none",color:"#fff",fontFamily:"inherit",fontWeight:600,cursor:"pointer",opacity:loading?0.6:1,marginTop:4}}>
+          {loading?"Aguarde...":mode==="login"?"Entrar":"Criar conta"}
         </button>
+        <div style={{textAlign:"center",marginTop:14,fontSize:"13px",color:"#666"}}>
+          {mode==="login"?<span>Não tem conta? {lnk("Cadastre-se","register")}</span>:<span>{lnk("← Voltar ao login","login")}</span>}
+        </div>
       </div>
     </div>
   );
 }
 
-function Emprestimos({ loans, clients, loading, reload }){
+// ── EMPRÉSTIMOS ───────────────────────────────────────────────────────
+function Emprestimos({ loans, clients, loading, reload, token, userId }){
   const [show,setShow]=useState(false);
   const [form,setForm]=useState({cliente_id:"",valor:"",juros:"",parcelas:"",vencimento:"",status:"pendente"});
   const [editId,setEditId]=useState(null);
@@ -134,17 +175,18 @@ function Emprestimos({ loans, clients, loading, reload }){
   async function save(){
     if(!form.cliente_id||!form.valor||!form.vencimento) return;
     setSaving(true);
-    if(editId) await sbUpdate("emprestimos",editId,{cliente_id:form.cliente_id,valor:parseFloat(form.valor),juros:parseFloat(form.juros)||0,parcelas:parseInt(form.parcelas)||1,vencimento:form.vencimento,status:form.status});
-    else await sbInsert("emprestimos",{cliente_id:form.cliente_id,valor:parseFloat(form.valor),juros:parseFloat(form.juros)||0,parcelas:parseInt(form.parcelas)||1,vencimento:form.vencimento,status:form.status});
+    const data={cliente_id:form.cliente_id,valor:parseFloat(form.valor),juros:parseFloat(form.juros)||0,parcelas:parseInt(form.parcelas)||1,vencimento:form.vencimento,status:form.status,user_id:userId};
+    if(editId) await sbUpdate("emprestimos",editId,data,token);
+    else await sbInsert("emprestimos",data,token);
     setSaving(false); setShow(false); reload();
   }
-  async function togglePago(l){ await sbUpdate("emprestimos",l.id,{status:l.status==="pago"?"pendente":"pago"}); reload(); }
-  async function remove(id){ await sbDelete("emprestimos",id); reload(); }
+  async function togglePago(l){ await sbUpdate("emprestimos",l.id,{status:l.status==="pago"?"pendente":"pago"},token); reload(); }
+  async function remove(id){ await sbDelete("emprestimos",id,token); reload(); }
 
   const fbSt=(k,red)=>({background:filt===k?(red?"rgba(220,50,50,0.2)":"rgba(30,200,130,0.2)"):"transparent",border:"1px solid "+(filt===k?(red?"rgba(220,80,80,0.5)":"rgba(30,200,130,0.5)"):"rgba(255,255,255,0.15)"),borderRadius:20,color:filt===k?(red?"#ff8888":"#80ffcc"):"#888",padding:"5px 13px",cursor:"pointer",fontSize:"12px",fontFamily:"inherit"});
 
   if(loading) return <Spinner/>;
-  return (
+  return(
     <div>
       {alertas.length>0&&<div style={{background:"rgba(255,160,0,0.08)",border:"1px solid rgba(255,160,0,0.3)",borderRadius:12,padding:"12px 14px",marginBottom:16}}>
         <div style={{fontSize:"12px",fontWeight:600,color:"#ffcc50",marginBottom:8}}>🔔 Vencimentos próximos ({alertas.length})</div>
@@ -153,28 +195,21 @@ function Emprestimos({ loans, clients, loading, reload }){
           <span style={{fontSize:"12px",fontWeight:600,color:"#ffcc50"}}>{mon(tot(l.valor,l.juros))}</span>
         </div>;})}
       </div>}
-
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <div><div style={{fontSize:"18px",fontWeight:700}}>Empréstimos</div><div style={{fontSize:"12px",color:"#666"}}>{loans.length} registro{loans.length!==1?"s":""}</div></div>
         <Btn ch="+ Novo" fn={openNew} type="pri"/>
       </div>
-
       <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
         {[{k:"todos",l:"Todos"},{k:"pendente",l:"Pendentes"},{k:"pago",l:"Pagos"},{k:"vencido",l:"Vencidos"+(nv>0?" ("+nv+")":"")}].map(x=><button key={x.k} style={fbSt(x.k,x.k==="vencido")} onClick={()=>setFilt(x.k)}>{x.l}</button>)}
       </div>
-
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:16}}>
-        {[{l:"Emprestado",v:loans.reduce((s,l)=>s+(parseFloat(l.valor)||0),0),c:"#fff"},
-          {l:"A receber",v:loans.filter(l=>l.status==="pendente").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#ffcc50"},
-          {l:"Recebido",v:loans.filter(l=>l.status==="pago").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#1ec882"}
-        ].map(k=>(
+        {[{l:"Emprestado",v:loans.reduce((s,l)=>s+(parseFloat(l.valor)||0),0),c:"#fff"},{l:"A receber",v:loans.filter(l=>l.status==="pendente").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#ffcc50"},{l:"Recebido",v:loans.filter(l=>l.status==="pago").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#1ec882"}].map(k=>(
           <div key={k.l} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:10}}>
             <div style={{fontSize:"9px",color:"#666",marginBottom:4,textTransform:"uppercase"}}>{k.l}</div>
             <div style={{fontSize:"12px",fontWeight:700,color:k.c}}>{mon(k.v)}</div>
           </div>
         ))}
       </div>
-
       {filtered.length===0&&<div style={{textAlign:"center",padding:40,color:"#444"}}>Nenhum empréstimo.</div>}
       {filtered.map(l=>{
         const vc=expired(l.vencimento,l.status);const cli=gc(l.cliente_id);const cfg=CC[cli?.classificacao||"neutro"];const d=daysLeft(l.vencimento,l.status);
@@ -204,7 +239,6 @@ function Emprestimos({ loans, clients, loading, reload }){
           </div>
         </div>;
       })}
-
       {show&&<Overlay onClose={()=>setShow(false)}>
         <div style={{fontSize:"16px",fontWeight:700,marginBottom:16}}>{editId?"Editar":"Novo empréstimo"}</div>
         <Label t="Cliente *"/>
@@ -236,7 +270,8 @@ function Emprestimos({ loans, clients, loading, reload }){
   );
 }
 
-function Clientes({ loans, clients, loading, reload }){
+// ── CLIENTES ──────────────────────────────────────────────────────────
+function Clientes({ loans, clients, loading, reload, token, userId }){
   const [show,setShow]=useState(false);
   const [form,setForm]=useState({nome:"",telefone:"",cpf:"",classificacao:"neutro",observacao:"",indicado_por:""});
   const [editId,setEditId]=useState(null);
@@ -246,11 +281,16 @@ function Clientes({ loans, clients, loading, reload }){
   const filtered=clients.filter(c=>c.nome.toLowerCase().includes(search.toLowerCase())||(c.telefone||"").includes(search));
   function openNew(){ setForm({nome:"",telefone:"",cpf:"",classificacao:"neutro",observacao:"",indicado_por:""}); setEditId(null); setShow(true); }
   function openEdit(c){ setForm({nome:c.nome,telefone:c.telefone||"",cpf:c.cpf||"",classificacao:c.classificacao,observacao:c.observacao||"",indicado_por:c.indicado_por||""}); setEditId(c.id); setShow(true); }
-  async function save(){ if(!form.nome)return; setSaving(true); if(editId)await sbUpdate("clientes",editId,form); else await sbInsert("clientes",form); setSaving(false); setShow(false); reload(); }
-  async function remove(id){ await sbDelete("clientes",id); reload(); }
+  async function save(){
+    if(!form.nome)return; setSaving(true);
+    if(editId) await sbUpdate("clientes",editId,form,token);
+    else await sbInsert("clientes",{...form,user_id:userId},token);
+    setSaving(false); setShow(false); reload();
+  }
+  async function remove(id){ await sbDelete("clientes",id,token); reload(); }
 
   if(loading) return <Spinner/>;
-  return (
+  return(
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
         <div><div style={{fontSize:"18px",fontWeight:700}}>Clientes</div><div style={{fontSize:"12px",color:"#666"}}>{clients.length} cadastrado{clients.length!==1?"s":""}</div></div>
@@ -306,6 +346,7 @@ function Clientes({ loans, clients, loading, reload }){
   );
 }
 
+// ── RELATÓRIO ─────────────────────────────────────────────────────────
 function Relatorio({ loans, clients, loading }){
   if(loading) return <Spinner/>;
   const now=new Date();
@@ -383,52 +424,62 @@ function Relatorio({ loans, clients, loading }){
   );
 }
 
+// ── APP PRINCIPAL ─────────────────────────────────────────────────────
 export default function App(){
-  const [logado,setLogado]=useState(false);
+  const [sess,setSess]=useState(null);
+  const [rdy,setRdy]=useState(false);
   const [tab,setTab]=useState("emp");
   const [loans,setLoans]=useState([]);
   const [clients,setClients]=useState([]);
   const [loading,setLoading]=useState(true);
 
-  // Previne zoom ao focar input no iOS
   useEffect(()=>{
-  const meta=document.querySelector('meta[name="viewport"]');
-  const reset=()=>{
-    if(meta){
-      meta.setAttribute("content","width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no");
-      setTimeout(()=>{
-        meta.setAttribute("content","width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes");
-      },300);
-    }
-  };
-  document.addEventListener('focusout', reset);
-  return ()=>document.removeEventListener('focusout', reset);
-},[]);
+    const token=localStorage.getItem("sb_token");
+    const user=localStorage.getItem("sb_user");
+    if(token&&user){ setSess({token,...JSON.parse(user)}); }
+    setRdy(true);
+  },[]);
 
   async function reload(){
+    if(!sess) return;
     setLoading(true);
-    const [c,l]=await Promise.all([sbGet("clientes"),sbGet("emprestimos")]);
+    const [c,l]=await Promise.all([sbGet("clientes",sess.token),sbGet("emprestimos",sess.token)]);
     setClients(Array.isArray(c)?c:[]);
     setLoans(Array.isArray(l)?l:[]);
     setLoading(false);
   }
 
-  useEffect(()=>{ if(logado) reload(); },[logado]);
+  useEffect(()=>{ if(sess) reload(); },[sess]);
+
+  function handleLogin(s){
+    setSess(s);
+    localStorage.setItem("sb_token",s.token);
+    localStorage.setItem("sb_user",JSON.stringify({email:s.email,id:s.id}));
+  }
+
+  async function handleLogout(){
+    if(sess) await signOut(sess.token);
+    localStorage.removeItem("sb_token");
+    localStorage.removeItem("sb_user");
+    setSess(null); setLoans([]); setClients([]);
+  }
 
   const tSt=t=>({background:"transparent",border:"none",color:tab===t?"#fff":"#666",padding:"10px 14px",cursor:"pointer",fontSize:"12px",fontFamily:"inherit",fontWeight:tab===t?700:400,borderBottom:tab===t?"2px solid #1ec882":"2px solid transparent"});
 
-  if(!logado) return <LoginPage onLogin={()=>setLogado(true)}/>;
+  if(!rdy) return <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:BG,color:"#fff"}}>Carregando...</div>;
+  if(!sess) return <LoginPage onLogin={handleLogin}/>;
 
   return(
-    <div style={{fontFamily:"'Inter',sans-serif",background:BG,minHeight:"100vh",color:"#fff",maxWidth:"100vw",overflowX:"hidden",position:"relative"}}>
+    <div style={{fontFamily:"'Inter',sans-serif",background:BG,minHeight:"100vh",color:"#fff"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:22}}>💰</span>
           <span style={{fontSize:"13px",fontWeight:700}}>Emprestimos BN8K</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
+          <span style={{fontSize:"11px",color:"#666"}}>{sess.email}</span>
           <button onClick={reload} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,color:"#aaa",padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:"12px"}}>↻</button>
-          <Btn ch="Sair" fn={()=>setLogado(false)}/>
+          <Btn ch="Sair" fn={handleLogout}/>
         </div>
       </div>
       <div style={{display:"flex",padding:"8px 12px 0",borderBottom:"1px solid rgba(255,255,255,0.07)",overflowX:"auto"}}>
@@ -437,8 +488,8 @@ export default function App(){
         <button style={tSt("rel")} onClick={()=>setTab("rel")}>📊 Relatório</button>
       </div>
       <div style={{padding:"12px 10px"}}>
-        {tab==="emp"&&<Emprestimos loans={loans} clients={clients} loading={loading} reload={reload}/>}
-        {tab==="cli"&&<Clientes loans={loans} clients={clients} loading={loading} reload={reload}/>}
+        {tab==="emp"&&<Emprestimos loans={loans} clients={clients} loading={loading} reload={reload} token={sess.token} userId={sess.id}/>}
+        {tab==="cli"&&<Clientes loans={loans} clients={clients} loading={loading} reload={reload} token={sess.token} userId={sess.id}/>}
         {tab==="rel"&&<Relatorio loans={loans} clients={clients} loading={loading}/>}
       </div>
     </div>
