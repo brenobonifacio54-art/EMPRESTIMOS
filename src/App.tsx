@@ -81,7 +81,7 @@ function LoginPage({ onLogin }){
     <div style={{minHeight:"100vh",display:"flex",alignItems:"center",justifyContent:"center",background:BG,fontFamily:"'Inter',sans-serif",padding:20}}>
       <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:24,padding:"36px 28px",width:340,maxWidth:"100%",color:"#fff",textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:12}}>💰</div>
-        <h2 style={{margin:"0 0 4px",fontSize:22}}>EmpréstimoPro</h2>
+        <h2 style={{margin:"0 0 4px",fontSize:22}}>Emprestimos BN8K</h2>
         <p style={{color:"#666",fontSize:13,margin:"0 0 24px"}}>Acesso privado</p>
         {err&&<div style={{background:"rgba(220,50,50,0.15)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",fontSize:12,color:"#ff8888",marginBottom:12}}>{err}</div>}
         <Label t="Senha de acesso"/>
@@ -381,7 +381,7 @@ export default function App(){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:22}}>💰</span>
-          <span style={{fontSize:13,fontWeight:700}}>EmpréstimoPro</span>
+          <span style={{fontSize:13,fontWeight:700}}>Emprestimos BN8K</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
           <button onClick={reload} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,color:"#aaa",padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:12}}>↻</button>
