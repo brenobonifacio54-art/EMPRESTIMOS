@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 const SUPA_URL = "https://qptkhnkvurtxwsovmmzi.supabase.co";
 const SUPA_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFwdGtobmt2dXJ0eHdzb3ZtbXppIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODMzNzk1NTQsImV4cCI6MjA5ODk1NTU1NH0.9n9uZpT4lbxA7zUmEtaX6Ws2Hu7cB2HXtp7jLBdRp0U";
 const USER_ID = "breno";
-const SENHA = "breno2024";
+const SENHA = "BNnotas123@";
 
 async function sbGet(table) {
   const res = await fetch(`${SUPA_URL}/rest/v1/${table}?user_id=eq.${USER_ID}&order=created_at.asc`, {
