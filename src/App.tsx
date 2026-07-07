@@ -142,7 +142,7 @@ function Emprestimos({ loans, clients, loading, reload }){
       <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
         {[{k:"todos",l:"Todos"},{k:"pendente",l:"Pendentes"},{k:"pago",l:"Pagos"},{k:"vencido",l:"Vencidos"+(nv>0?" ("+nv+")":"")}].map(x=><button key={x.k} style={fbSt(x.k,x.k==="vencido")} onClick={()=>setFilt(x.k)}>{x.l}</button>)}
       </div>
-      <div style={{display:"flex",gap:8,marginBottom:16}}>
+      <div style={{display:"grid",gridTemplateColumns:"1fr 1fr 1fr",gap:6,marginBottom:16}}>
         {[{l:"Emprestado",v:loans.reduce((s,l)=>s+(parseFloat(l.valor)||0),0),c:"#fff"},{l:"A receber",v:loans.filter(l=>l.status==="pendente").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#ffcc50"},{l:"Recebido",v:loans.filter(l=>l.status==="pago").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#1ec882"}].map(k=>(
           <div key={k.l} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:12,flex:1}}>
             <div style={{fontSize:10,color:"#666",marginBottom:4,textTransform:"uppercase"}}>{k.l}</div>
@@ -378,7 +378,7 @@ export default function App(){
 
   return (
     <div style={{fontFamily:"'Inter',sans-serif",background:BG,minHeight:"100vh",color:"#fff"}}>
-      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"14px 18px 0"}}>
+      <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:22}}>💰</span>
           <span style={{fontSize:13,fontWeight:700}}>Emprestimos BN8K</span>
@@ -388,12 +388,12 @@ export default function App(){
           <Btn ch="Sair" fn={()=>setLogado(false)}/>
         </div>
       </div>
-      <div style={{display:"flex",padding:"16px 18px 0",borderBottom:"1px solid rgba(255,255,255,0.07)"}}>
+      <div style={{display:"flex",padding:"8px 12px 0",borderBottom:"1px solid rgba(255,255,255,0.07)",overflowX:"auto"}}>
         <button style={tSt("emp")} onClick={()=>setTab("emp")}>💰 Empréstimos</button>
         <button style={tSt("cli")} onClick={()=>setTab("cli")}>👥 Clientes{clients.length>0&&<span style={{background:"rgba(255,255,255,0.1)",borderRadius:10,padding:"1px 6px",fontSize:10,marginLeft:4}}>{clients.length}</span>}</button>
         <button style={tSt("rel")} onClick={()=>setTab("rel")}>📊 Relatório</button>
       </div>
-      <div style={{padding:18}}>
+      <div style={{padding:"12px 10px"}}>
         {tab==="emp"&&<Emprestimos loans={loans} clients={clients} loading={loading} reload={reload}/>}
         {tab==="cli"&&<Clientes loans={loans} clients={clients} loading={loading} reload={reload}/>}
         {tab==="rel"&&<Relatorio loans={loans} clients={clients} loading={loading}/>}
