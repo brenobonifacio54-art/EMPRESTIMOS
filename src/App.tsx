@@ -363,6 +363,16 @@ export default function App(){
   const [clients,setClients]=useState([]);
   const [loading,setLoading]=useState(true);
 
+  useEffect(()=>{
+    const inputs=document.querySelectorAll('input, select, textarea');
+    inputs.forEach(input=>{
+      input.addEventListener('blur',()=>{
+        window.scrollTo(0,0);
+        document.body.scrollTop=0;
+      });
+    });
+  },[logado]);
+
   async function reload(){
     setLoading(true);
     const [c,l]=await Promise.all([sbGet("clientes"),sbGet("emprestimos")]);
