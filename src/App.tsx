@@ -55,10 +55,10 @@ const card = { background:"rgba(255,255,255,0.05)", border:"1px solid rgba(255,2
 
 function Btn({ ch, fn, type="def", disabled=false }){
   const styles = {
-    def: { background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)", color:"#fff", borderRadius:8, padding:"7px 13px", cursor:"pointer", fontFamily:"inherit", fontSize:12 },
-    pri: { background:"linear-gradient(135deg,#1ec882,#14a064)", border:"none", color:"#fff", borderRadius:8, padding:"9px 18px", cursor:"pointer", fontFamily:"inherit", fontSize:13, fontWeight:600, opacity:disabled?0.5:1 },
-    red: { background:"rgba(220,50,50,0.2)", border:"1px solid rgba(220,80,80,0.4)", color:"#ff8080", borderRadius:8, padding:"7px 11px", cursor:"pointer", fontFamily:"inherit", fontSize:12 },
-    grn: { background:"rgba(37,211,102,0.12)", border:"1px solid rgba(37,211,102,0.35)", color:"#64f096", borderRadius:8, padding:"6px 11px", cursor:"pointer", fontFamily:"inherit", fontSize:12 },
+    def: { background:"rgba(255,255,255,0.1)", border:"1px solid rgba(255,255,255,0.2)", color:"#fff", borderRadius:8, padding:"7px 13px", cursor:"pointer", fontFamily:"inherit", fontSize:16 },
+    pri: { background:"linear-gradient(135deg,#1ec882,#14a064)", border:"none", color:"#fff", borderRadius:8, padding:"9px 18px", cursor:"pointer", fontFamily:"inherit", fontSize:16, fontWeight:600, opacity:disabled?0.5:1 },
+    red: { background:"rgba(220,50,50,0.2)", border:"1px solid rgba(220,80,80,0.4)", color:"#ff8080", borderRadius:8, padding:"7px 11px", cursor:"pointer", fontFamily:"inherit", fontSize:16 },
+    grn: { background:"rgba(37,211,102,0.12)", border:"1px solid rgba(37,211,102,0.35)", color:"#64f096", borderRadius:8, padding:"6px 11px", cursor:"pointer", fontFamily:"inherit", fontSize:16 },
   };
   return <button onClick={fn} disabled={disabled} style={styles[type]}>{ch}</button>;
 }
@@ -83,8 +83,8 @@ function LoginPage({ onLogin }){
       <div style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.12)",borderRadius:24,padding:"36px 28px",width:340,maxWidth:"100%",color:"#fff",textAlign:"center"}}>
         <div style={{fontSize:40,marginBottom:12}}>💰</div>
         <h2 style={{margin:"0 0 4px",fontSize:22}}>Emprestimos BN8K</h2>
-        <p style={{color:"#666",fontSize:13,margin:"0 0 24px"}}>Acesso privado</p>
-        {err&&<div style={{background:"rgba(220,50,50,0.15)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",fontSize:12,color:"#ff8888",marginBottom:12}}>{err}</div>}
+        <p style={{color:"#666",fontSize:16,margin:"0 0 24px"}}>Acesso privado</p>
+        {err&&<div style={{background:"rgba(220,50,50,0.15)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",fontSize:16,color:"#ff8888",marginBottom:12}}>{err}</div>}
         <Label t="Senha de acesso"/>
         <input style={inp} type="password" placeholder="••••••••" value={p} onChange={e=>{setP(e.target.value);setErr("");}} onKeyDown={e=>e.key==="Enter"&&go()}/>
         <button onClick={go} style={{width:"100%",padding:11,fontSize:14,borderRadius:10,background:"linear-gradient(135deg,#1ec882,#14a064)",border:"none",color:"#fff",fontFamily:"inherit",fontWeight:600,cursor:"pointer"}}>
@@ -124,20 +124,20 @@ function Emprestimos({ loans, clients, loading, reload }){
   async function togglePago(l){ await sbUpdate("emprestimos",l.id,{status:l.status==="pago"?"pendente":"pago"}); reload(); }
   async function remove(id){ await sbDelete("emprestimos",id); reload(); }
 
-  const fbSt=(k,red)=>({background:filt===k?(red?"rgba(220,50,50,0.2)":"rgba(30,200,130,0.2)"):"transparent",border:"1px solid "+(filt===k?(red?"rgba(220,80,80,0.5)":"rgba(30,200,130,0.5)"):"rgba(255,255,255,0.15)"),borderRadius:20,color:filt===k?(red?"#ff8888":"#80ffcc"):"#888",padding:"5px 13px",cursor:"pointer",fontSize:12,fontFamily:"inherit"});
+  const fbSt=(k,red)=>({background:filt===k?(red?"rgba(220,50,50,0.2)":"rgba(30,200,130,0.2)"):"transparent",border:"1px solid "+(filt===k?(red?"rgba(220,80,80,0.5)":"rgba(30,200,130,0.5)"):"rgba(255,255,255,0.15)"),borderRadius:20,color:filt===k?(red?"#ff8888":"#80ffcc"):"#888",padding:"5px 13px",cursor:"pointer",fontSize:16,fontFamily:"inherit"});
 
   if(loading) return <Spinner/>;
   return (
     <div>
       {alertas.length>0&&<div style={{background:"rgba(255,160,0,0.08)",border:"1px solid rgba(255,160,0,0.3)",borderRadius:12,padding:"12px 14px",marginBottom:16}}>
-        <div style={{fontSize:12,fontWeight:600,color:"#ffcc50",marginBottom:8}}>🔔 Vencimentos próximos ({alertas.length})</div>
+        <div style={{fontSize:16,fontWeight:600,color:"#ffcc50",marginBottom:8}}>🔔 Vencimentos próximos ({alertas.length})</div>
         {alertas.map(l=>{const cli=gc(l.cliente_id);const d=daysLeft(l.vencimento,l.status);return<div key={l.id} style={{display:"flex",justifyContent:"space-between",padding:"5px 0",borderTop:"1px solid rgba(255,255,255,0.05)"}}>
-          <span style={{fontSize:12}}>{d===0?"🔴":d<=2?"🟠":"🟡"} {cli?.nome||"—"} — {d===0?"hoje":d===1?"amanhã":d+" dias"}</span>
-          <span style={{fontSize:12,fontWeight:600,color:"#ffcc50"}}>{mon(tot(l.valor,l.juros))}</span>
+          <span style={{fontSize:16}}>{d===0?"🔴":d<=2?"🟠":"🟡"} {cli?.nome||"—"} — {d===0?"hoje":d===1?"amanhã":d+" dias"}</span>
+          <span style={{fontSize:16,fontWeight:600,color:"#ffcc50"}}>{mon(tot(l.valor,l.juros))}</span>
         </div>;})}
       </div>}
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        <div><div style={{fontSize:18,fontWeight:700}}>Empréstimos</div><div style={{fontSize:12,color:"#666"}}>{loans.length} registro{loans.length!==1?"s":""}</div></div>
+        <div><div style={{fontSize:18,fontWeight:700}}>Empréstimos</div><div style={{fontSize:16,color:"#666"}}>{loans.length} registro{loans.length!==1?"s":""}</div></div>
         <Btn ch="+ Novo" fn={openNew} type="pri"/>
       </div>
       <div style={{display:"flex",gap:8,marginBottom:16,flexWrap:"wrap"}}>
@@ -147,7 +147,7 @@ function Emprestimos({ loans, clients, loading, reload }){
         {[{l:"Emprestado",v:loans.reduce((s,l)=>s+(parseFloat(l.valor)||0),0),c:"#fff"},{l:"A receber",v:loans.filter(l=>l.status==="pendente").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#ffcc50"},{l:"Recebido",v:loans.filter(l=>l.status==="pago").reduce((s,l)=>s+tot(l.valor,l.juros),0),c:"#1ec882"}].map(k=>(
           <div key={k.l} style={{background:"rgba(255,255,255,0.05)",border:"1px solid rgba(255,255,255,0.1)",borderRadius:12,padding:12,flex:1}}>
             <div style={{fontSize:10,color:"#666",marginBottom:4,textTransform:"uppercase"}}>{k.l}</div>
-            <div style={{fontSize:13,fontWeight:700,color:k.c}}>{mon(k.v)}</div>
+            <div style={{fontSize:16,fontWeight:700,color:k.c}}>{mon(k.v)}</div>
           </div>
         ))}
       </div>
@@ -164,7 +164,7 @@ function Emprestimos({ loans, clients, loading, reload }){
           </div>
           {cli?.indicado_por&&<div style={{fontSize:11,color:"#88aaff",marginBottom:6}}>🤝 Indicado por: <b>{cli.indicado_por}</b></div>}
           {cli?.observacao&&<div style={{fontSize:11,color:"#ffcc88",background:"rgba(255,180,0,0.07)",borderRadius:6,padding:"4px 8px",marginBottom:6}}>📝 {cli.observacao}</div>}
-          <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:12,color:"#888",marginBottom:10}}>
+          <div style={{display:"flex",gap:12,flexWrap:"wrap",fontSize:16,color:"#888",marginBottom:10}}>
             <span>Capital <b style={{color:"#ccc"}}>{mon(l.valor)}</b></span>
             {l.juros?<span>Juros <b style={{color:"#ccc"}}>{l.juros}%</b></span>:null}
             {l.parcelas>1?<span>{l.parcelas}x <b style={{color:"#ccc"}}>{mon(tot(l.valor,l.juros)/l.parcelas)}</b></span>:null}
@@ -188,11 +188,11 @@ function Emprestimos({ loans, clients, loading, reload }){
           <span style={{position:"absolute",left:10,top:"50%",transform:"translateY(-50%)",color:"#666",pointerEvents:"none"}}>🔍</span>
           {showDrop&&dropList.length>0&&<div style={{position:"absolute",width:"100%",zIndex:10,top:"100%",marginTop:4,background:"#1a1a2e",border:"1px solid rgba(255,255,255,0.15)",borderRadius:10,overflow:"hidden"}}>
             {dropList.map(c=>{const cfg=CC[c.classificacao||"neutro"];return<div key={c.id} onClick={()=>{setForm(f=>({...f,cliente_id:c.id}));setSearch(c.nome);setShowDrop(false);}} style={{padding:"10px 12px",cursor:"pointer",display:"flex",alignItems:"center",gap:8,borderBottom:"1px solid rgba(255,255,255,0.05)"}}>
-              <span>{cfg.icon}</span><div><div style={{fontSize:13}}>{c.nome}</div><div style={{fontSize:11,color:cfg.c}}>{cfg.l}</div></div>
+              <span>{cfg.icon}</span><div><div style={{fontSize:16}}>{c.nome}</div><div style={{fontSize:11,color:cfg.c}}>{cfg.l}</div></div>
             </div>;})}
           </div>}
         </div>
-        {selCli?.classificacao==="mau"&&<div style={{background:"rgba(220,50,50,0.12)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:12,color:"#ff8888"}}>🚫 Atenção: Mau pagador!</div>}
+        {selCli?.classificacao==="mau"&&<div style={{background:"rgba(220,50,50,0.12)",border:"1px solid rgba(220,80,80,0.3)",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:16,color:"#ff8888"}}>🚫 Atenção: Mau pagador!</div>}
         <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8}}>
           <div><Label t="Valor R$ *"/><input style={inp} type="number" placeholder="0,00" value={form.valor} onChange={e=>setForm(f=>({...f,valor:e.target.value}))}/></div>
           <div><Label t="Juros %"/><input style={inp} type="number" placeholder="0" value={form.juros} onChange={e=>setForm(f=>({...f,juros:e.target.value}))}/></div>
@@ -201,7 +201,7 @@ function Emprestimos({ loans, clients, loading, reload }){
         </div>
         <Label t="Status"/>
         <select style={inp} value={form.status} onChange={e=>setForm(f=>({...f,status:e.target.value}))}><option value="pendente">Pendente</option><option value="pago">Pago</option></select>
-        {form.valor&&<div style={{background:"rgba(30,200,130,0.08)",border:"1px solid rgba(30,200,130,0.2)",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:12,color:"#aaa"}}>Total: <b style={{color:"#80ffcc"}}>{mon(tot(form.valor,form.juros))}</b></div>}
+        {form.valor&&<div style={{background:"rgba(30,200,130,0.08)",border:"1px solid rgba(30,200,130,0.2)",borderRadius:8,padding:"8px 12px",marginBottom:10,fontSize:16,color:"#aaa"}}>Total: <b style={{color:"#80ffcc"}}>{mon(tot(form.valor,form.juros))}</b></div>}
         <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:4}}>
           <Btn ch="Cancelar" fn={()=>setShow(false)}/>
           <Btn ch={saving?"Salvando...":editId?"Salvar":"Cadastrar"} fn={save} type="pri" disabled={saving}/>
@@ -228,7 +228,7 @@ function Clientes({ loans, clients, loading, reload }){
   return (
     <div>
       <div style={{display:"flex",justifyContent:"space-between",alignItems:"center",marginBottom:16}}>
-        <div><div style={{fontSize:18,fontWeight:700}}>Clientes</div><div style={{fontSize:12,color:"#666"}}>{clients.length} cadastrado{clients.length!==1?"s":""}</div></div>
+        <div><div style={{fontSize:18,fontWeight:700}}>Clientes</div><div style={{fontSize:16,color:"#666"}}>{clients.length} cadastrado{clients.length!==1?"s":""}</div></div>
         <Btn ch="+ Cadastrar" fn={openNew} type="pri"/>
       </div>
       <div style={{position:"relative",marginBottom:14}}>
@@ -241,10 +241,10 @@ function Clientes({ loans, clients, loading, reload }){
       {filtered.length===0&&<div style={{textAlign:"center",padding:40,color:"#444"}}>Nenhum cliente.</div>}
       {filtered.map(c=>{const cfg=CC[c.classificacao||"neutro"];const ec=loans.filter(l=>l.cliente_id===c.id).length;return(
         <div key={c.id} style={{...card,display:"flex",alignItems:"center",gap:12}}>
-          <div style={{width:42,height:42,borderRadius:"50%",background:cfg.bg,display:"flex",alignItems:"center",justifyContent:"center",color:cfg.c,fontWeight:700,fontSize:13,flexShrink:0}}>{initials(c.nome)}</div>
+          <div style={{width:42,height:42,borderRadius:"50%",background:cfg.bg,display:"flex",alignItems:"center",justifyContent:"center",color:cfg.c,fontWeight:700,fontSize:16,flexShrink:0}}>{initials(c.nome)}</div>
           <div style={{flex:1,minWidth:0}}>
             <div style={{display:"flex",justifyContent:"space-between",alignItems:"flex-start"}}>
-              <div><div style={{fontSize:14,fontWeight:700}}>{c.nome}</div><div style={{fontSize:12,color:"#666"}}>{c.telefone||"—"}{c.cpf?" · "+c.cpf:""}</div></div>
+              <div><div style={{fontSize:14,fontWeight:700}}>{c.nome}</div><div style={{fontSize:16,color:"#666"}}>{c.telefone||"—"}{c.cpf?" · "+c.cpf:""}</div></div>
               <span style={{fontSize:11,padding:"3px 9px",borderRadius:20,background:cfg.bg,color:cfg.c,flexShrink:0}}>{cfg.icon} {cfg.l}</span>
             </div>
             {c.indicado_por&&<div style={{fontSize:11,color:"#88aaff",marginTop:4}}>🤝 Indicado por: <b>{c.indicado_por}</b></div>}
@@ -267,7 +267,7 @@ function Clientes({ loans, clients, loading, reload }){
         <Label t="Indicado por"/><input style={inp} placeholder="Nome de quem indicou (opcional)" value={form.indicado_por||""} onChange={e=>setForm(f=>({...f,indicado_por:e.target.value}))}/>
         <Label t="Classificação"/>
         <div style={{display:"flex",gap:6,flexWrap:"wrap",marginBottom:12}}>
-          {Object.entries(CC).map(([k,v])=><button key={k} onClick={()=>setForm(f=>({...f,classificacao:k}))} style={{borderRadius:20,padding:"6px 12px",cursor:"pointer",fontSize:12,fontFamily:"inherit",background:form.classificacao===k?v.bg:"rgba(255,255,255,0.05)",border:"1px solid "+(form.classificacao===k?v.c:"rgba(255,255,255,0.1)"),color:form.classificacao===k?v.c:"#666"}}>{v.icon} {v.l}</button>)}
+          {Object.entries(CC).map(([k,v])=><button key={k} onClick={()=>setForm(f=>({...f,classificacao:k}))} style={{borderRadius:20,padding:"6px 12px",cursor:"pointer",fontSize:16,fontFamily:"inherit",background:form.classificacao===k?v.bg:"rgba(255,255,255,0.05)",border:"1px solid "+(form.classificacao===k?v.c:"rgba(255,255,255,0.1)"),color:form.classificacao===k?v.c:"#666"}}>{v.icon} {v.l}</button>)}
         </div>
         <Label t="Observação"/><textarea style={{...inp,resize:"vertical"}} rows={2} placeholder="Observações..." value={form.observacao} onChange={e=>setForm(f=>({...f,observacao:e.target.value}))}/>
         <div style={{display:"flex",gap:8,justifyContent:"flex-end",marginTop:4}}>
@@ -299,12 +299,12 @@ function Relatorio({ loans, clients, loading }){
   });
   const mMax=Math.max(...meses.map(m=>Math.max(m.emp,m.rec)),1);
   const top=clients.map(c=>{const cl=loans.filter(l=>l.cliente_id===c.id);return{...c,tv:cl.reduce((s,l)=>s+tot(l.valor,l.juros),0),cnt:cl.length};}).filter(c=>c.cnt>0).sort((a,b)=>b.tv-a.tv).slice(0,5);
-  const sh={fontSize:12,fontWeight:700,color:"#666",textTransform:"uppercase",marginBottom:10};
+  const sh={fontSize:16,fontWeight:700,color:"#666",textTransform:"uppercase",marginBottom:10};
   const row={display:"flex",justifyContent:"space-between",alignItems:"center",padding:"9px 0",borderBottom:"1px solid rgba(255,255,255,0.05)"};
   return (
     <div>
       <div style={{fontSize:18,fontWeight:700,marginBottom:4}}>Relatório</div>
-      <div style={{fontSize:12,color:"#666",marginBottom:20}}>{loans.length} empréstimos · {clients.length} clientes</div>
+      <div style={{fontSize:16,color:"#666",marginBottom:20}}>{loans.length} empréstimos · {clients.length} clientes</div>
       <div style={{display:"grid",gridTemplateColumns:"1fr 1fr",gap:8,marginBottom:24}}>
         {[{l:"Capital",v:mon(T),c:"#fff"},{l:"Juros",v:mon(J),c:"#ffcc50"},{l:"Total",v:mon(CJ),c:"#fff"},{l:"Recebido",v:mon(R),c:"#1ec882"},{l:"Em aberto",v:mon(AB),c:"#ffcc50"},{l:"Em atraso",v:mon(TV),c:TV>0?"#ff6666":"#555"}].map(k=>(
           <div key={k.l} style={{background:"rgba(255,255,255,0.04)",border:"1px solid rgba(255,255,255,0.08)",borderRadius:12,padding:12}}>
@@ -326,7 +326,7 @@ function Relatorio({ loans, clients, loading }){
         <div style={sh}>Últimos 6 meses</div>
         {meses.map(m=>(
           <div key={m.lbl} style={{background:"rgba(255,255,255,0.03)",border:"1px solid rgba(255,255,255,0.07)",borderRadius:10,padding:"10px 12px",marginBottom:6}}>
-            <div style={{display:"flex",justifyContent:"space-between",fontSize:12,marginBottom:6}}><b>{m.lbl}</b><span style={{color:"#555"}}>{m.cnt} empréstimo{m.cnt!==1?"s":""}</span></div>
+            <div style={{display:"flex",justifyContent:"space-between",fontSize:16,marginBottom:6}}><b>{m.lbl}</b><span style={{color:"#555"}}>{m.cnt} empréstimo{m.cnt!==1?"s":""}</span></div>
             {m.emp>0&&<><div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"#666",marginBottom:3}}><span>Emprestado</span><span>{mon(m.emp)}</span></div><div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:6,overflow:"hidden",marginBottom:6}}><div style={{height:6,width:(m.emp/mMax*100)+"%",background:"rgba(100,150,255,0.7)",borderRadius:6}}/></div></>}
             {m.rec>0&&<><div style={{display:"flex",justifyContent:"space-between",fontSize:11,color:"#666",marginBottom:3}}><span>Recebido</span><span style={{color:"#1ec882"}}>{mon(m.rec)}</span></div><div style={{height:6,background:"rgba(255,255,255,0.06)",borderRadius:6,overflow:"hidden"}}><div style={{height:6,width:(m.rec/mMax*100)+"%",background:"rgba(30,200,130,0.7)",borderRadius:6}}/></div></>}
             {m.emp===0&&<div style={{fontSize:11,color:"#444",textAlign:"center"}}>Sem movimentação</div>}
@@ -336,7 +336,7 @@ function Relatorio({ loans, clients, loading }){
       {VL.length>0&&<div style={{marginBottom:24}}>
         <div style={{...sh,color:"#ff6666"}}>⚠ Inadimplência ({VL.length})</div>
         {VL.map(l=>{const c=clients.find(x=>x.id===l.cliente_id);const dias=Math.floor((new Date()-new Date(l.vencimento+"T23:59:59"))/864e5);return<div key={l.id} style={row}>
-          <div><div style={{fontSize:13,fontWeight:600}}>{c?.nome||"—"}</div><div style={{fontSize:11,color:"#ff6666"}}>{dias} dia{dias!==1?"s":""} em atraso</div></div>
+          <div><div style={{fontSize:16,fontWeight:600}}>{c?.nome||"—"}</div><div style={{fontSize:11,color:"#ff6666"}}>{dias} dia{dias!==1?"s":""} em atraso</div></div>
           <div style={{textAlign:"right"}}><div style={{fontWeight:700,color:"#ff8888"}}>{mon(tot(l.valor,l.juros))}</div><div style={{fontSize:11,color:"#555"}}>{new Date(l.vencimento+"T12:00:00").toLocaleDateString("pt-BR")}</div></div>
         </div>;})}
       </div>}
@@ -346,7 +346,7 @@ function Relatorio({ loans, clients, loading }){
           <div style={{display:"flex",alignItems:"center",gap:8}}>
             <span style={{color:"#444",minWidth:20}}>#{i+1}</span>
             <div style={{width:30,height:30,borderRadius:"50%",background:cfg.bg,display:"flex",alignItems:"center",justifyContent:"center",color:cfg.c,fontSize:11,fontWeight:700}}>{initials(c.nome)}</div>
-            <div><div style={{fontSize:13,fontWeight:600}}>{c.nome}</div><div style={{fontSize:11,color:cfg.c}}>{cfg.l}{c.indicado_por?" · via "+c.indicado_por:""}</div></div>
+            <div><div style={{fontSize:16,fontWeight:600}}>{c.nome}</div><div style={{fontSize:11,color:cfg.c}}>{cfg.l}{c.indicado_por?" · via "+c.indicado_por:""}</div></div>
           </div>
           <div style={{textAlign:"right"}}><div style={{fontWeight:700}}>{mon(c.tv)}</div><div style={{fontSize:11,color:"#555"}}>{c.cnt} empréstimo{c.cnt!==1?"s":""}</div></div>
         </div>;})}
@@ -373,7 +373,7 @@ export default function App(){
 
   useEffect(()=>{ if(logado) reload(); },[logado]);
 
-  const tSt=t=>({background:"transparent",border:"none",color:tab===t?"#fff":"#666",padding:"10px 14px",cursor:"pointer",fontSize:12,fontFamily:"inherit",fontWeight:tab===t?700:400,borderBottom:tab===t?"2px solid #1ec882":"2px solid transparent"});
+  const tSt=t=>({background:"transparent",border:"none",color:tab===t?"#fff":"#666",padding:"10px 14px",cursor:"pointer",fontSize:16,fontFamily:"inherit",fontWeight:tab===t?700:400,borderBottom:tab===t?"2px solid #1ec882":"2px solid transparent"});
 
   if(!logado) return <LoginPage onLogin={()=>setLogado(true)}/>;
 
@@ -382,10 +382,10 @@ export default function App(){
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:22}}>💰</span>
-          <span style={{fontSize:13,fontWeight:700}}>Emprestimos BN8K</span>
+          <span style={{fontSize:16,fontWeight:700}}>Emprestimos BN8K</span>
         </div>
         <div style={{display:"flex",alignItems:"center",gap:10}}>
-          <button onClick={reload} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,color:"#aaa",padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:12}}>↻</button>
+          <button onClick={reload} style={{background:"rgba(255,255,255,0.08)",border:"1px solid rgba(255,255,255,0.15)",borderRadius:8,color:"#aaa",padding:"5px 10px",cursor:"pointer",fontFamily:"inherit",fontSize:16}}>↻</button>
           <Btn ch="Sair" fn={()=>setLogado(false)}/>
         </div>
       </div>
