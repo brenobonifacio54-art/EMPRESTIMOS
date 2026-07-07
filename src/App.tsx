@@ -411,7 +411,7 @@ export default function App(){
   if(!logado) return <LoginPage onLogin={()=>setLogado(true)}/>;
 
   return(
-    <div style={{fontFamily:"'Inter',sans-serif",background:BG,minHeight:"100vh",color:"#fff"}}>
+    <div style={{fontFamily:"'Inter',sans-serif",background:BG,minHeight:"100vh",color:"#fff",maxWidth:"100vw",overflowX:"hidden",position:"relative"}}>
       <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"10px 12px 0"}}>
         <div style={{display:"flex",alignItems:"center",gap:8}}>
           <span style={{fontSize:22}}>💰</span>
